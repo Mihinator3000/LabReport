@@ -7,7 +7,7 @@ namespace LabReport
     public class ReportGenerator
     {
         private readonly string _reportPath;
-        private readonly IoService _ioService = new();
+        private readonly IoService _ioService = new IoService();
 
         private StreamWriter _writer;
 
