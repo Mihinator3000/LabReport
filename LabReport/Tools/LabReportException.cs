@@ -1,18 +1,21 @@
-﻿namespace LabReport.Tools;
+﻿using System;
 
-public class LabReportException : Exception
+namespace LabReport.Tools
 {
-    public LabReportException()
+    public class LabReportException : Exception
     {
-    }
+        public LabReportException()
+        {
+        }
 
-    public LabReportException(string message)
-        : base(message)
-    {
-    }
+        public LabReportException(string message)
+            : base(message)
+        {
+        }
 
-    public LabReportException(string message, Exception innerException)
-        : base(message, innerException)
-    {
+        public LabReportException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
     }
 }

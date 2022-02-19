@@ -1,7 +1,3 @@
-﻿namespace LabReport;
+﻿using LabReport;
 
-internal static class Program
-{
-    private static void Main() =>
-        new ReportGenerator().Create();
-}
+new ReportGenerator().Create();
