@@ -1,6 +1,4 @@
-﻿using LabReport;
-
-namespace LabReport
+﻿namespace LabReport
 {
     internal static class Program
     {
