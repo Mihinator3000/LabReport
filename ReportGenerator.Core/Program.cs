@@ -5,18 +5,16 @@ using ReportGenerator.Core.Tools;
 
 try
 {
-    for (int i = 1; i <= 5; i++)
-    {
-        var inputData = new InputModelBuilder()
-            .SetLabNumber(i)
-            .SetFullName("Кошкин Михаил")
-            .SetGroupName("M32051")
-            .SetReportFolderPath(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))
-            .SetCodeProvider(new LocalCodeProvider(@"C:\Users\Koshkin\Desktop\Banks"))
-            .Build();
+    var inputData = new InputModelBuilder()
+        .SetLabNumber(1)
+        .SetFullName("Кошкин Михаил")
+        .SetGroupName("M32051")
+        .SetReportFolderPath(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))
+        .SetCodeProvider(new GithubCodeProvider("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", "Mihinator3000", 1))
+        //.SetCodeProvider(new LocalCodeProvider(@"C:\Users\Koshkin\Desktop\Banks"))
+        .Build();
 
-        new WordCreator(inputData).CreateReport();
-    }
+    new WordCreator(inputData).CreateReport();
 }
 catch (ReportGenException e)
 {
