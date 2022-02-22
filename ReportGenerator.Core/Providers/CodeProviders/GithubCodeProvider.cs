@@ -28,7 +28,7 @@ public class GithubCodeProvider : ICodeProvider
 
         var response = client.GetAsync(GetPullUrl).Result;
         if (!response.IsSuccessStatusCode)
-            throw new ReportGenException("pull request not found");
+            throw new ReportGenException($"pull request not found, status code: {response.StatusCode}");
 
         string responseContent = response.Content.ReadAsStringAsync().Result;
         return NormalizeGithubOutput(responseContent);
