@@ -47,7 +47,6 @@ public class WordCreator
         {
             application.ActiveDocument.Close();
             application.Quit();
-            
         }
     }
 }
