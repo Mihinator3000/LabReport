@@ -42,7 +42,7 @@ public class GithubCodeProvider : ICodeProvider
         s = Regex.Replace(s, @"(?m)^diff --git(.+?\n){0,5}--- /dev/null\n\+\+\+ b/(.+?)\n@@ -.+?\+.+? @@", "\n\nAdded $2:\n");
         s = Regex.Replace(s, @"(?m)^diff --git(?s-m).+?\+\+\+ b/(.+?)\n@@ -.+?\+.+? @@", "\n\nChanged $1:\n");
         s = Regex.Replace(s, @"(?m)^diff --git(.+?\n){0,5}Binary files /dev/null and b/(.+?) differ", "\nAdded $2\n");
-        s = Regex.Replace(s, @"(?m)^diff --git(?s-m).+?Binary.+?b/(.+?) differ", "\nChanged $1\n"); 
+        s = Regex.Replace(s, @"(?m)^diff --git(?s-m).+?Binary.+?b/(.+?) differ", "\nChanged $1\n");
         s = Regex.Replace(s, @"(?m)^@@ -.+?\+.+? @@.+?", string.Empty);
         return s.Trim('\n');
     }
