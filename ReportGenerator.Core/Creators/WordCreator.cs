@@ -22,17 +22,16 @@ public class WordCreator
 
         var tagDictionary = _inputData.GetTagDictionary();
 
-        if (File.Exists(_inputData.GetReportPath))
-            File.Delete(_inputData.GetReportPath);
+        byte[] byteArray = File.ReadAllBytes(TemplateWordPath);
 
-        string reportPath = _inputData.GetReportPath;
+        using var memoryStream = new MemoryStream();
+        memoryStream.Write(byteArray, 0, byteArray.Length);
 
-        File.Copy(TemplateWordPath, reportPath);
+        using (var wordDocument = WordprocessingDocument.Open(memoryStream, true))
+            foreach (var (tag, replacementText) in tagDictionary)
+                ReplaceTag(wordDocument, tag, replacementText);
 
-        using var wordDocument = WordprocessingDocument.Open(reportPath, true);
-
-        foreach (var (tag, replacementText) in tagDictionary)
-            ReplaceTag(wordDocument, tag, replacementText);
+        File.WriteAllBytes(_inputData.GetReportPath, memoryStream.ToArray());
     }
 
     private static void ReplaceTag(WordprocessingDocument wordDocument, string tag, string replacementText)
@@ -44,7 +43,6 @@ public class WordCreator
         foreach (var text in run.Elements<Text>())
         {
             Console.WriteLine(text.Text);
-
             if (!text.Text.Contains(tag))
                 continue;
             
@@ -54,6 +52,8 @@ public class WordCreator
 
             if (replacementLines.Length is 1)
                 return;
+
+            run.AppendChild(new Paragraph());
 
             foreach (string replacementLine in replacementLines[1..])
             {
