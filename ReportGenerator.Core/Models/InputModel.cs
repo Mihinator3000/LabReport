@@ -45,11 +45,11 @@ public class InputModel
     public Dictionary<string, string> GetTagDictionary()
         => new()
         {
-            { "<LABNUMBER>", _labNumber.ToString() },
-            { "<FULLNAME>", _fullName },
-            { "<GROUPNAME>", _groupName },
-            { "<DESCRIPTION>", _descriptionProvider.GetLabDescription() },
-            { "<SOURCECODE>", _codeProvider.GetSourceCode() }
+            { "tagLABNUMBERtag", _labNumber.ToString() },
+            { "tagFULLNAMEtag", _fullName },
+            { "tagGROUPNAMEtag", _groupName },
+            { "tagDESCRIPTIONtag", _descriptionProvider.GetLabDescription() },
+            { "tagSOURCECODEtag", _codeProvider.GetSourceCode() }
         };
 
     public string GetReportPath

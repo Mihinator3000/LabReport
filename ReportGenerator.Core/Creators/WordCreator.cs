@@ -1,7 +1,7 @@
-﻿using Microsoft.Office.Interop.Word;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using ReportGenerator.Core.Models;
 using ReportGenerator.Core.Tools;
-using Range = Microsoft.Office.Interop.Word.Range;
 
 namespace ReportGenerator.Core.Creators;
 
@@ -11,42 +11,68 @@ public class WordCreator
 
     private readonly InputModel _inputData;
 
-    private readonly FileInfo _fileInfo;
-
     public WordCreator(InputModel inputData)
-    {
-        _inputData = inputData ?? throw new ArgumentNullException(nameof(inputData));
+        => _inputData = inputData ?? throw new ArgumentNullException(nameof(inputData));
 
-        _fileInfo = File.Exists(TemplateWordPath)
-            ? new FileInfo(TemplateWordPath)
-            : throw new ReportGenException(
-                "template file does not exist");
-    }
 
     public void CreateReport()
     {
+        if (!File.Exists(TemplateWordPath))
+            throw new ReportGenException("template file does not exist");
+
         var tagDictionary = _inputData.GetTagDictionary();
 
-        var application = new Application();
-        try
-        {
-            Document document = application.Documents.Open(_fileInfo.FullName);
+        if (File.Exists(_inputData.GetReportPath))
+            File.Delete(_inputData.GetReportPath);
 
-            foreach (var (tag, replacementText) in tagDictionary)
+        string reportPath = _inputData.GetReportPath;
+
+        File.Copy(TemplateWordPath, reportPath);
+
+        using var wordDocument = WordprocessingDocument.Open(reportPath, true);
+
+        foreach (var (tag, replacementText) in tagDictionary)
+            ReplaceTag(wordDocument, tag, replacementText);
+    }
+
+    private static void ReplaceTag(WordprocessingDocument wordDocument, string tag, string replacementText)
+    {
+        var body = wordDocument.MainDocumentPart.Document.Body;
+
+        foreach (var paragraph in body.Elements<Paragraph>())
+        foreach (var run in paragraph.Elements<Run>())
+        foreach (var text in run.Elements<Text>())
+        {
+            Console.WriteLine(text.Text);
+
+            if (!text.Text.Contains(tag))
+                continue;
+            
+            string[] replacementLines = replacementText.Split('\n');
+
+            text.Text = text.Text.Replace(tag, replacementLines[0]);
+
+            if (replacementLines.Length is 1)
+                return;
+
+            foreach (string replacementLine in replacementLines[1..])
             {
-                Range range = document.Content;
-                range.Find.Execute(tag);
-                range = document.Range(range.Start, range.End);
-                range.Text = replacementText;
+                var newRun = new Run(new Text(replacementLine))
+                {
+                    RunProperties = (RunProperties) run
+                        .RunProperties.CloneNode(true)
+                };
+
+                var newParagraph = new Paragraph(newRun)
+                {
+                    ParagraphProperties = (ParagraphProperties) paragraph
+                        .ParagraphProperties.CloneNode(true)
+                };
+
+                run.AppendChild(newParagraph);
             }
 
-            string newFileName = _inputData.GetReportPath;
-            application.ActiveDocument.SaveAs2(newFileName);
-        }
-        finally
-        {
-            application.ActiveDocument.Close();
-            application.Quit();
+            return;
         }
     }
 }
