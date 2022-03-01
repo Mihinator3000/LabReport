@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,21 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <COMReference Include="Microsoft.Office.Interop.Word">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>7</VersionMinor>
-      <VersionMajor>8</VersionMajor>
-      <Guid>00020905-0000-0000-c000-000000000046</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
+	<PropertyGroup>
+		<RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
+	</PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Providers\CodeProviders\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Open-XML-SDK" Version="2.9.1" />
   </ItemGroup>
 
 </Project>
