@@ -57,7 +57,13 @@ public class WordCreator
 
             foreach (string replacementLine in replacementLines[1..])
             {
-                var newRun = new Run(new Text(replacementLine))
+                var newText = new Text
+                {
+                    Text = replacementLine,
+                    Space = SpaceProcessingModeValues.Preserve
+                };
+
+                var newRun = new Run(newText)
                 {
                     RunProperties = (RunProperties) run
                         .RunProperties.CloneNode(true)
