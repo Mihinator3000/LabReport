@@ -10,35 +10,27 @@ public class InputModel
     private readonly string _fullName;
     private readonly string _groupName;
 
-    private readonly string _reportFolderPath;
-
     private readonly ICodeProvider _codeProvider;
     
     private readonly DescriptionProvider _descriptionProvider;
 
-    internal InputModel(
+    public InputModel(
         int labNumber,
         string fullName,
         string groupName,
-        string reportFolderPath,
         ICodeProvider codeProvider)
     {
-        _labNumber = labNumber is >= 1 and <= 5
-            ? labNumber
-            : throw new ReportGenException(
-                "Incorrect lab number input");
+        if (labNumber is < 1 or > 5)
+            throw new ReportGenException("Incorrect lab number input");
 
-        _fullName = fullName ?? throw new ArgumentNullException(nameof(fullName));
+        ArgumentNullException.ThrowIfNull(fullName);
+        ArgumentNullException.ThrowIfNull(groupName);
+        ArgumentNullException.ThrowIfNull(codeProvider);
 
-        _groupName = groupName ?? throw new ArgumentNullException(nameof(groupName));
-
-        if (reportFolderPath is not null)
-            _reportFolderPath = Directory.Exists(reportFolderPath) 
-                ? reportFolderPath 
-                : throw new ReportGenException(
-                    "Incorrect report folder path");
-
-        _codeProvider = codeProvider ?? throw new ArgumentNullException(nameof(codeProvider));
+        _labNumber = labNumber;
+        _fullName = fullName;
+        _groupName = groupName;
+        _codeProvider = codeProvider;
 
         _descriptionProvider = new DescriptionProvider(labNumber);
     }
@@ -53,11 +45,15 @@ public class InputModel
             { "tagSOURCECODEtag", _codeProvider.GetSourceCode() }
         };
 
-    public string GetReportPath
-        => $"{GetReportName}.docx";
+    public string GetReportPath()
+        => $"{GetReportName()}.docx";
 
-    private string GetReportName
-        => @$"Отчет{_labNumber}Лабораторная{_fullName
-            .Replace(" ", null)
-            .Replace(".", null)}{_groupName}";
+    private string GetReportName()
+    {
+        string formattedFullName = _fullName
+            .Replace(" ", string.Empty)
+            .Replace(".", string.Empty);
+
+        return $"Отчет{_labNumber}Лабораторная{formattedFullName}{_groupName}";
+    }
 }

@@ -13,17 +13,19 @@ public class LocalCodeProvider : ICodeProvider
 
     public LocalCodeProvider(string localFolderPath)
     {
-        _localFolderPath = Directory.Exists(localFolderPath)
-            ? localFolderPath
-            : throw new ReportGenException(
-                "directory does not exist");
+        if (!Directory.Exists(localFolderPath))
+            throw new ReportGenException("directory does not exist");
+
+        _localFolderPath = localFolderPath;
 
         _stringBuilder = new StringBuilder();
     }
 
     public LocalCodeProvider(string localFolderPath, DateTime previousReportTime)
         : this(localFolderPath)
-        => _previousReportTime = previousReportTime;
+    {
+        _previousReportTime = previousReportTime;
+    }
 
     public string GetSourceCode()
     {
@@ -60,10 +62,8 @@ public class LocalCodeProvider : ICodeProvider
         => Path.GetExtension(fileInfo.Name) is not ".java";
 
     private bool IsChangedFile(FileInfo fileInfo)
-        => _previousReportTime is null ||
-           fileInfo.LastWriteTime > _previousReportTime;
+        => _previousReportTime is null || fileInfo.LastWriteTime > _previousReportTime;
 
     private bool IsNewFile(FileInfo fileInfo)
-        => _previousReportTime is null ||
-           fileInfo.CreationTime > _previousReportTime;
+        => _previousReportTime is null || fileInfo.CreationTime > _previousReportTime;
  }

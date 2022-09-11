@@ -15,8 +15,7 @@ public class DescriptionProvider
         var match = Regex.Match(desc);
 
         if (!match.Success)
-            throw new ReportGenException(
-                "invalid description");
+            throw new ReportGenException("Invalid description");
 
         return match.Groups[1].Value;
     }
