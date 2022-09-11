@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
 using ReportGenerator.Core.Tools;
 
@@ -27,14 +29,15 @@ public class GithubCodeProvider : ICodeProvider
         client.DefaultRequestHeaders.UserAgent.TryParseAdd(_githubUserName);
 
         var response = client.GetAsync(GetPullUrl).Result;
+        
         if (!response.IsSuccessStatusCode)
-            throw new ReportGenException($"pull request not found, status code: {response.StatusCode}");
+            throw new GitHubException(response.StatusCode);
 
         string responseContent = response.Content.ReadAsStringAsync().Result;
         return NormalizeGithubOutput(responseContent);
     }
 
-    private static string NormalizeGithubOutput(string s)
+    public static string NormalizeGithubOutput(string s)
     {
         s = s.Replace("\n\\ No newline at end of file", null);
         s = Regex.Replace(s, @"(?m)^diff --git (.+?\n){0,5}--- a/(.+?)\n\+\+\+ /dev/null\n@@ -.+?\+.+? @@\n(-.*?\n)+(-.*)?", "\nУдален файл $2\n");

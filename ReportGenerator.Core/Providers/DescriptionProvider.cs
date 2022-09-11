@@ -5,22 +5,14 @@ namespace ReportGenerator.Core.Providers;
 
 public class DescriptionProvider
 {
-    private const string DescriptionPath = @"..\..\..\..\docs\lab_description.txt";
-
     private readonly int _labNumber;
 
     public DescriptionProvider(int labNumber)
         => _labNumber = labNumber;
 
-    public string GetLabDescription()
+    public string GetLabDescription(string desc)
     {
-        if (!File.Exists(DescriptionPath))
-            throw new ReportGenException(
-                "description file does not exist");
-        
-        string labsDescription = File.ReadAllText(DescriptionPath);
-
-        var match = Regex.Match(labsDescription);
+        var match = Regex.Match(desc);
 
         if (!match.Success)
             throw new ReportGenException(
