@@ -1,0 +1,45 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    @if (User.Identity is null || !User.Identity.IsAuthenticated)
+    {
+        <a style="margin: 50px" asp-action="Login" asp-controller="Auth" class="btn btn-outline-primary">Log In with GitHub</a>
+    }
+    else
+    {
+        <form method="post">
+            <p>
+                <u1 style="font-size: 200%; margin-right: 10px">Номер лабораторной:</u1>
+                <input type="number" required="required" name="labNumber" min="1" max="5" style="width: 40px"/>
+            </p>
+            <p>
+                <u1 style="font-size: 200%; margin-right: 10px">Номер пул реквеста:</u1>
+                <input type="number" name="pullNumber" min="1" style="width: 40px"/>
+                <br/>
+                <u1 style="color:gray">(Обычно совпадает с номером лабораторной)</u1>
+            </p>
+            <p>
+                <u1 style="font-size: 200%; margin-right: 10px">Название репозитория:</u1>
+                <input type="text" required="required" name="githubUserName" value="@Model.GithubUserName"/>
+                <br/>
+                <u1 style="color:gray">(Должно совпадать с юзернеймом гитхаба)</u1>
+            </p>
+            <p>
+                <u1 style="font-size: 200%; margin-right: 10px">ФИО:</u1>
+                <input type="text" required="required" name="fullName" placeholder="Фамилия Имя Отчество" style="width: 250px"/>
+            </p>
+            <p>
+                <u1 style="font-size: 200%; margin-right: 10px">Номер группы:</u1>
+                <input type="text" required="required" name="groupName" placeholder="M32XXX" pattern="[MМ]32\d{3}" style="width: 68px"/>
+            </p>
+            <br/>
+            <p>
+                <input type="submit" style="font-size: 200%; padding: 0 10px 0 10px" value="Сгенерировать отчет" asp-page-handler="DownloadWord"/>
+            </p>
+        </form>
+    }
+</div>
