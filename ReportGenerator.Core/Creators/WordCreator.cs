@@ -1,37 +1,31 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using ReportGenerator.Core.Models;
-using ReportGenerator.Core.Tools;
 
 namespace ReportGenerator.Core.Creators;
 
 public class WordCreator
 {
-    private const string TemplateWordPath = @"..\..\..\..\docs\report.docx";
+    private readonly Dictionary<string, string> _tagDictionary;
 
-    private readonly InputModel _inputData;
-
-    public WordCreator(InputModel inputData)
-        => _inputData = inputData ?? throw new ArgumentNullException(nameof(inputData));
-
-
-    public void CreateReport()
+    public WordCreator(InputModel inputData, string desc)
     {
-        if (!File.Exists(TemplateWordPath))
-            throw new ReportGenException("template file does not exist");
+        ArgumentNullException.ThrowIfNull(inputData);
 
-        var tagDictionary = _inputData.GetTagDictionary();
+        _tagDictionary = inputData.GetTagDictionary(desc);
+    }
 
-        byte[] byteArray = File.ReadAllBytes(TemplateWordPath);
-
+    public MemoryStream CreateReport(byte[] byteArray)
+    {
         using var memoryStream = new MemoryStream();
         memoryStream.Write(byteArray, 0, byteArray.Length);
 
         using (var wordDocument = WordprocessingDocument.Open(memoryStream, true))
-            foreach (var (tag, replacementText) in tagDictionary)
+            foreach (var (tag, replacementText) in _tagDictionary)
                 ReplaceTag(wordDocument, tag, replacementText);
 
-        File.WriteAllBytes(_inputData.GetReportPath, memoryStream.ToArray());
+        return memoryStream;
     }
 
     private static void ReplaceTag(WordprocessingDocument wordDocument, string tag, string replacementText)
@@ -42,7 +36,6 @@ public class WordCreator
         foreach (var run in paragraph.Elements<Run>())
         foreach (var text in run.Elements<Text>())
         {
-            Console.WriteLine(text.Text);
             if (!text.Text.Contains(tag))
                 continue;
             
@@ -50,29 +43,38 @@ public class WordCreator
 
             text.Text = text.Text.Replace(tag, replacementLines[0]);
 
-            if (replacementLines.Length is 1)
-                return;
-
-            run.AppendChild(new Paragraph());
-
-            foreach (string replacementLine in replacementLines[1..])
-            {
-                var newRun = new Run(new Text(replacementLine))
-                {
-                    RunProperties = (RunProperties) run
-                        .RunProperties.CloneNode(true)
-                };
-
-                var newParagraph = new Paragraph(newRun)
-                {
-                    ParagraphProperties = (ParagraphProperties) paragraph
-                        .ParagraphProperties.CloneNode(true)
-                };
-
-                run.AppendChild(newParagraph);
-            }
+            if (replacementLines.Length is not 1)
+                AppendParagraph(paragraph, run, replacementLines[1..]);
 
             return;
+        }
+    }
+
+    private static void AppendParagraph(Paragraph paragraph, Run run, IEnumerable<string> replacementLines)
+    {
+        run.AppendChild(new Paragraph());
+
+        foreach (string replacementLine in replacementLines)
+        {
+            var newText = new Text
+            {
+                Text = replacementLine,
+                Space = SpaceProcessingModeValues.Preserve
+            };
+
+            var newRun = new Run(newText)
+            {
+                RunProperties = (RunProperties)run
+                    .RunProperties.CloneNode(true)
+            };
+
+            var newParagraph = new Paragraph(newRun)
+            {
+                ParagraphProperties = (ParagraphProperties)paragraph
+                    .ParagraphProperties.CloneNode(true)
+            };
+
+            run.AppendChild(newParagraph);
         }
     }
 }

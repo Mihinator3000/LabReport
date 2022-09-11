@@ -32,28 +32,29 @@ public class InputModel
 
         _groupName = groupName ?? throw new ArgumentNullException(nameof(groupName));
 
-        _reportFolderPath = Directory.Exists(reportFolderPath)
-            ? reportFolderPath
-            : throw new ReportGenException(
-                "Incorrect report folder path");
+        if (reportFolderPath is not null)
+            _reportFolderPath = Directory.Exists(reportFolderPath) 
+                ? reportFolderPath 
+                : throw new ReportGenException(
+                    "Incorrect report folder path");
 
         _codeProvider = codeProvider ?? throw new ArgumentNullException(nameof(codeProvider));
 
         _descriptionProvider = new DescriptionProvider(labNumber);
     }
 
-    public Dictionary<string, string> GetTagDictionary()
-        => new()
+    public Dictionary<string, string> GetTagDictionary(string desc)
+        => new() 
         {
             { "tagLABNUMBERtag", _labNumber.ToString() },
             { "tagFULLNAMEtag", _fullName },
             { "tagGROUPNAMEtag", _groupName },
-            { "tagDESCRIPTIONtag", _descriptionProvider.GetLabDescription() },
+            { "tagDESCRIPTIONtag", _descriptionProvider.GetLabDescription(desc) },
             { "tagSOURCECODEtag", _codeProvider.GetSourceCode() }
         };
 
     public string GetReportPath
-        => Path.Combine(_reportFolderPath, $"{GetReportName}.docx");
+        => $"{GetReportName}.docx";
 
     private string GetReportName
         => @$"Отчет{_labNumber}Лабораторная{_fullName
