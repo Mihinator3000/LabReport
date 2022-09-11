@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+	
+  <PropertyGroup>
+	<RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\ReportGenerator.Core\ReportGenerator.Core.csproj" />
+  </ItemGroup>
+
+</Project>
